@@ -1,13 +1,14 @@
 const asyncHandle = require("express-async-handler");
-const User = require('../models/usermodel');
+const User = require("../models/usermodel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv").config();
 //@desc Register User
 //@route Post api/users/register
 //@access Public
+
 const registerUser = asyncHandle(async (req, res) => {
-  const { first,last, email, password } = req.body;
-  console.log(first,last, email, password);
+  const { first, last, email, password } = req.body;
   if (!first || !last || !email || !password) {
     res.status(400);
     throw new Error("All fields are mandetory");
@@ -17,18 +18,28 @@ const registerUser = asyncHandle(async (req, res) => {
     res.status(400).json({ error: "User Already Exists" });
     return;
   }
-  //Hash password 
+  //Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
   console.log(hashedPassword, "Hashed Password");
   const user = await User.create({
     first,
     last,
     email,
-    password: hashedPassword,
+    password: hashedPassword
   });
-  console.log(user);
   if (user) {
-    res.status(201).json({ _id: user.id, email: user.email });
+    const accessToken = jwt.sign(
+      {
+        user: {
+          id: user._id,
+          email: user.email
+        }
+      },
+      process.env.ACCESS_TOKEN_SECRET
+    );
+    res
+      .status(201)
+      .json({ _id: user.id, email: user.email, token: accessToken });
   } else {
     res.status(400).json({ error: "User data not valid" });
   }
@@ -51,13 +62,11 @@ const loginUser = asyncHandle(async (req, res) => {
     const accessToken = jwt.sign(
       {
         user: {
-          username: userAvailable.username,
-          email: userAvailable.email,
           id: userAvailable.id,
-        },
+          email: userAvailable.email
+        }
       },
-      process.env.ACCESS_TOKEN_SECERT,
-      { expiresIn: "15m" }
+      process.env.ACCESS_TOKEN_SECERT
     );
     res.status(200).json({ accessToken });
   } else {
