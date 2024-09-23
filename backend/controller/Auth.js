@@ -39,7 +39,7 @@ const registerUser = asyncHandle(async (req, res) => {
     );
     res
       .status(201)
-      .json({ _id: user.id, email: user.email, token: accessToken });
+      .json({ token: accessToken });
   } else {
     res.status(400).json({ error: "User data not valid" });
   }
@@ -68,7 +68,7 @@ const loginUser = asyncHandle(async (req, res) => {
       },
       process.env.ACCESS_TOKEN_SECERT
     );
-    res.status(200).json({ accessToken });
+    res.status(200).json({ token:accessToken });
   } else {
     res.status(401).json({ error: "email or password not valid" });
   }
