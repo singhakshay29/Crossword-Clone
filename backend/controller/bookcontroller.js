@@ -4,7 +4,8 @@ const asynchandler= require('express-async-handler');
 
 //get all book
 const getbook= asynchandler(async (req,res)=>{
-    const book=await Book.find({});
+    const limit = parseInt(req.query.limit) || 100;
+    const book = await Book.find({}).limit(limit);
     res.status(200).json({
         count:book.length,
         data:book
