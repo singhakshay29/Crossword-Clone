@@ -12,11 +12,7 @@ const port = process.env.PORT || 8080;
 // middleware
 app.use(express.json());
 app.use(
-  cors({
-    origin: ["https://backend-bookstore-section.vercel.app"],
-    method: ["GET", "POST"],
-    credentials: true
-  })
+  cors()
 );
 
 app.use("/user", userRoutes);
