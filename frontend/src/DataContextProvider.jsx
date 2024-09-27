@@ -1,6 +1,9 @@
+/* eslint-disable react/prop-types */
 import axios from 'axios';
 import {useEffect, useState} from "react";
-import DataContext from "./DataContext"
+import { allbooks } from '../Api';
+import {AuthContext, DataContext} from './Context';
+
 
 
 const DataContextProvider = ({ children }) =>{
@@ -12,7 +15,7 @@ const DataContextProvider = ({ children }) =>{
             setBooks(JSON.parse(storedData));
         }else{
             axios
-        .get('http://localhost:8081/book')
+        .get(allbooks)
         .then((response) => {
           setBooks(response.data.data);
           localStorage.setItem("booksMela", JSON.stringify(
@@ -37,4 +40,14 @@ const DataContextProvider = ({ children }) =>{
     )
 }
 
-export default DataContextProvider;
+const AuthContextProvider=({children})=>{
+    const [loginUser,]=useState(true);
+    
+    return(
+        <AuthContext.Provider value={{loginUser}}>
+            {children}
+        </AuthContext.Provider>
+    )
+}
+
+export {DataContextProvider,AuthContextProvider};
