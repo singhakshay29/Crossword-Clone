@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState, } from "react";
-import Navbar from "../components/Navbar";
-import Carousel from "../components/Carousel";
 import BookShelfSection from "../components/BookShelfSection";
-import DataContext from '../DataContext';
 import RotateLoader from "react-spinners/RotateLoader";
+import {DataContext} from "../Context";
+import CarouselSection from "../components/Carousel";
+
 
 const override = {
   display: "block",
@@ -16,7 +16,15 @@ export default function Home() {
   const { books } = useContext(DataContext);
   const [loading, setLoading] = useState(true);
 
-  const sectionSudha=books.filter((item)=>(item.author=='Sudha Murty'));
+  const sectionSudha=books.filter((item)=>(item.author==='Sudha Murty'));
+  const sectionHeartwarming = books.filter((item) => (
+    !/sudha\s*murty|sudha\s*murthy|murthy\s*,\s*sudha|murty\s*,\s*sudha/i.test(item.author) && !('section' in item)
+  ));
+  
+  const sectionFiction=books.filter((item)=>(item.section==='Fiction'));
+  const sectionNonFiction=books.filter((item)=>(item.section==='Non Fiction'));
+
+  
   console.log(books);
 
   useEffect(() => {
@@ -41,10 +49,11 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <Navbar />
-          <Carousel />
+          <CarouselSection />
           <BookShelfSection  data={sectionSudha} heading={"Sudha Murty Books"}/>
-          <BookShelfSection  data={sectionSudha} heading={"Heartwarming Cozy Reads"}/>
+          <BookShelfSection  data={sectionHeartwarming} heading={"Heartwarming Cozy Reads"}/>
+          <BookShelfSection  data={sectionFiction} heading={"Fiction"}/>
+          <BookShelfSection  data={sectionNonFiction} heading={"Non Fiction"}/>
         </>
       )}
     </>

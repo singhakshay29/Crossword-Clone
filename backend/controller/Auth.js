@@ -62,11 +62,11 @@ const loginUser = asyncHandle(async (req, res) => {
     const accessToken = jwt.sign(
       {
         user: {
-          id: userAvailable.id,
+          id: userAvailable._id,
           email: userAvailable.email
         }
       },
-      process.env.ACCESS_TOKEN_SECERT
+      process.env.ACCESS_TOKEN_SECRET
     );
     res.status(200).json({ token:accessToken });
   } else {
@@ -79,5 +79,53 @@ const loginUser = asyncHandle(async (req, res) => {
 const currentUser = asyncHandle(async (req, res) => {
   res.json(req.user);
 });
+//@desc Wishlist Add Item
+//@route Post api/users/wishlist
+//@access Private
 
-module.exports = { registerUser, loginUser, currentUser };
+const wishlist_Add = asyncHandle(async (req, res) =>{
+  const { item }=req.body;
+  if(!item){
+    res.status(400);
+    throw new Error("Item is Required");
+  }
+  const _id = req.user.id; 
+  const userAvailable = await User.findOne({ _id });
+  if(userAvailable){
+    userAvailable.wishlist.push(item);
+    await userAvailable.save();
+    res.status(200).json({ message: "Item added to wishlist" });
+  }else{
+    res.status(401).json({ error: "userId is not valid" });
+  }
+})
+
+const getwishlist = asyncHandle(async(req ,res)=>{
+  const _id = req.user.id; 
+  const userAvailable = await User.findById(_id);
+  if(userAvailable){
+    res.status(200).json( userAvailable.wishlist )
+  }else{
+    res.status(401).json({ error: "User ID is not valid" });
+  }
+})
+
+const wishlist_Del = asyncHandle(async(req,res)=>{
+  const product_Id = req.params.productId;
+  const _id = req.user.id; 
+  const userAvailable = await User.findById(_id);
+  if(userAvailable){
+    const productIndex = userAvailable.wishlist.findIndex(item => item._id.toString() === product_Id);
+    if (productIndex > -1) {
+      userAvailable.wishlist.splice(productIndex, 1);
+      await userAvailable.save();
+      res.status(200).json({ message: "Item removed from wishlist"});
+  }else{
+    res.status(404).json({ error: "Item not found in wishlist" });
+  }
+  }else{
+    res.status(404).json({ error: "User not found" });
+  }
+})
+
+module.exports = { registerUser, loginUser, currentUser, wishlist_Add,getwishlist,wishlist_Del };

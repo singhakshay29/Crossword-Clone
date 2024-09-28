@@ -16,4 +16,6 @@ app.use(cors());
 app.use("/user", userRoutes);
 app.use("/", bookRoutes);
 
+app.listen(port);
+
 module.exports = app;
