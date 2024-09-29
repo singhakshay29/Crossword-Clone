@@ -92,9 +92,14 @@ const wishlist_Add = asyncHandle(async (req, res) =>{
   const _id = req.user.id; 
   const userAvailable = await User.findOne({ _id });
   if(userAvailable){
-    userAvailable.wishlist.push(item);
-    await userAvailable.save();
-    res.status(200).json({ message: "Item added to wishlist" });
+    const productIndex = userAvailable.wishlist.findIndex(item => item._id === product_Id);
+    if (productIndex > -1) {
+      res.status(200).json({ message: "Item added to wishlist" });
+    }else{
+      userAvailable.wishlist.push(item);
+      await userAvailable.save();
+      res.status(200).json({ message: "Item added to wishlist" });
+    }
   }else{
     res.status(401).json({ error: "userId is not valid" });
   }
@@ -115,7 +120,7 @@ const wishlist_Del = asyncHandle(async(req,res)=>{
   const _id = req.user.id; 
   const userAvailable = await User.findById(_id);
   if(userAvailable){
-    const productIndex = userAvailable.wishlist.findIndex(item => item._id.toString() === product_Id);
+    const productIndex = userAvailable.wishlist.findIndex(item => item._id === product_Id);
     if (productIndex > -1) {
       userAvailable.wishlist.splice(productIndex, 1);
       await userAvailable.save();
