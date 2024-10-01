@@ -23,10 +23,10 @@ const userSchema = mongoose.Schema(
       type: Array,
       default: []
     },
-    cart: {
-      type: Array,
-      default: []
-    }
+    cart: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "Cart" 
+    },
   },
   {
     timeStamps: true
